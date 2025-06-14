@@ -121,3 +121,6 @@ streamlit run src/chatbot/interface.py
 • Execução local via CPU
 
 • Armazenamento e inferência 100% offline
+
+## 📌 Licença
+Este projeto é de uso interno da empresa Host Software International, Lda.
