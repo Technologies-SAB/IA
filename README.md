@@ -113,6 +113,7 @@ streamlit run src/chatbot/interface.py
 
 • pytesseract, Pillow
 
+
 🛡️ Restrições Técnicas
 
 • Nenhuma dependência de nuvem (OpenAI, Google, Microsoft, etc.)
