@@ -99,7 +99,7 @@ python src/embeddings/generate_embeddings.py
 streamlit run src/chatbot/interface.py
 ```
 
-🧠 Tecnologias Utilizadas
+## 🧠 Tecnologias Utilizadas
 
 • Python 3.10+
 
@@ -114,7 +114,7 @@ streamlit run src/chatbot/interface.py
 • pytesseract, Pillow
 
 
-🛡️ Restrições Técnicas
+## 🛡️ Restrições Técnicas
 
 • Nenhuma dependência de nuvem (OpenAI, Google, Microsoft, etc.)
 
