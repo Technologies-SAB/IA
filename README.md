@@ -88,3 +88,26 @@ cd llama.cpp && make
 ```bash
 python src/ingestion/html_to_md.py
 ```
+
+2. Gere os embeddings:
+```bash
+python src/embeddings/generate_embeddings.py
+```
+
+3. Inicie a interface do chatbot:
+```bash
+streamlit run src/chatbot/interface.py
+```
+
+🧠 Tecnologias Utilizadas
+• Python 3.10+
+• transformers, sentence-transformers
+• langchain, faiss, chromadb
+• llama.cpp, GGUF
+• streamlit, gradio, fastapi
+• pytesseract, Pillow
+
+🛡️ Restrições Técnicas
+• Nenhuma dependência de nuvem (OpenAI, Google, Microsoft, etc.)
+• Execução local via CPU
+• Armazenamento e inferência 100% offline
