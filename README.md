@@ -100,14 +100,23 @@ streamlit run src/chatbot/interface.py
 ```
 
 🧠 Tecnologias Utilizadas
+
 • Python 3.10+
+
 • transformers, sentence-transformers
+
 • langchain, faiss, chromadb
+
 • llama.cpp, GGUF
+
 • streamlit, gradio, fastapi
+
 • pytesseract, Pillow
 
 🛡️ Restrições Técnicas
+
 • Nenhuma dependência de nuvem (OpenAI, Google, Microsoft, etc.)
+
 • Execução local via CPU
+
 • Armazenamento e inferência 100% offline
