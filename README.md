@@ -19,7 +19,7 @@ Desenvolver um chatbot de IA 100% local, que funcione diretamente via CPU em um 
 ---
 
 ## 📁 Estrutura do Projeto
-
+```bash
 agente_ia_local/
 │
 ├── data/                      # Documentação convertida, imagens, dados brutos
@@ -55,7 +55,7 @@ agente_ia_local/
 ├── requirements.txt           # Dependências do projeto
 ├── README.md                  # Documentação do projeto
 └── .env                       # Variáveis de ambiente (se necessário)
-
+```
 ---
 
 ## ⚙️ Instalação
