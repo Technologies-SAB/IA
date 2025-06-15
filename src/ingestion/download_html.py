@@ -2,15 +2,11 @@ import os
 import re
 import requests
 from src.config import settings
+from src.utils.save_html import save_pages
 
 save_folder = settings.CONFLUENCE_SAVE_FOLDER
 
 os.makedirs(save_folder, exist_ok=True)
-
-def clean_filename(name):
-     name = re.sub(r'[<>:"/\\|?*\t]', '_', name)
-     name = name.replace(';', '_')
-     return name
 
 def download_all_pages():
     import requests
@@ -32,5 +28,7 @@ def download_all_pages():
     return pages
 
 def __init__():
-    global pages
-    pages = download_all_pages()
+    for space_key in space_keys:
+        global pages
+        pages = download_all_pages()
+        save_pages(pages, settings.CONFLUENCE_SPACE_KEY)
