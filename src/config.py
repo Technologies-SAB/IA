@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     CONFLUENCE_URL: str
     CONFLUENCE_USERNAME: str
     CONFLUENCE_API_TOKEN: str
+    CONFLUENCE_SPACE_KEY: list[str]
 
     # Caminho para guardar os documentos
     CONFLUENCE_SAVE_FOLDER: str
