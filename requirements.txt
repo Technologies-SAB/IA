@@ -1,0 +1,7 @@
+# Arquivo de dependências do projeto
+# Use este arquivo para instalar as dependências do projeto com pip
+pydantic
+pydantic_settings
+
+requests
+re
