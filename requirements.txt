@@ -5,3 +5,5 @@ pydantic_settings
 
 requests
 re
+
+tqdm
