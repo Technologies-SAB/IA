@@ -1,7 +1,12 @@
 import os
+import logging
 from bs4 import BeautifulSoup
 import html2text
 from src.config import settings
+from concurrent.futures import ThreadPoolExecutor
+
+# Configuração de logging
+logging.basicConfig(filename='conversion.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def convert_html_to_md(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -9,18 +14,18 @@ def convert_html_to_md(html_content):
     return markdown
 
 def proccess_html_files(html_folder, md_folder, space_keys):
-    if not os.path.exists(md_folder):
-        os.makedirs(md_folder, exist_ok=True)
+    try:
+        if not os.path.exists(md_folder):
+            os.makedirs(md_folder, exist_ok=True)
 
-    for space_key in space_keys:
-        html_space_folder = os.path.join(html_folder, space_key)
-        md_space_folder = os.path.join(md_folder, space_key)
+        for space_key in space_keys:
+            html_space_folder = os.path.join(html_folder, space_key)
+            md_space_folder = os.path.join(md_folder, space_key)
         if not os.path.exists(md_space_folder):
             os.makedirs(md_space_folder, exist_ok=True)
 
         if not os.path.exists(html_space_folder):
             print(f"⚠️ Pasta {html_space_folder} não encontrada, pulando...")
-            continue
 
         for filename in os.listdir(html_space_folder):
             if filename.endswith('.html'):
@@ -30,8 +35,10 @@ def proccess_html_files(html_folder, md_folder, space_keys):
 
                 with open(html_path, 'r', encoding='utf-8') as f:
                     html_content = f.read()
-                
-                markdown_content = convert_html_to_md(html_content)
-
+                    
+                    markdown = convert_html_to_md(html_content)
                 with open(md_path, 'w', encoding='utf-8') as f:
-                    f.write(markdown_content)
+                    f.write(markdown)
+                    logging.info(f"Arquivo convertido com sucesso: {md_path}")
+    except Exception as e:
+        logging.error(f"Erro ao processar {html_path}: {e}")
