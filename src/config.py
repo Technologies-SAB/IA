@@ -13,6 +13,7 @@ class Settings(BaseSettings):
 
     # Caminho para guardar os documentos
     CONFLUENCE_SAVE_FOLDER: str
+    CONFLUENCE_MD_FOLDER: str
 
     class Config:
         env_file = ".env"

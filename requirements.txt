@@ -7,3 +7,6 @@ requests
 re
 
 tqdm
+
+beautifulsoup4
+html2text
