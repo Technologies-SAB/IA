@@ -8,22 +8,30 @@ def convert_html_to_md(html_content):
     markdown = html2text.html2text(str(soup))
     return markdown
 
-def proccess_html_files(html_folder, md_folder):
+def proccess_html_files(html_folder, md_folder, space_keys):
     if not os.path.exists(md_folder):
         os.makedirs(md_folder, exist_ok=True)
 
-    for filename in os.listdir(html_folder):
-        if filename.endswith('.html'):
-            html_path = os.path.join(html_folder, filename)
-            md_filename = filename.replace('.html', '.md')
-            md_path = os.path.join(md_folder, md_filename)
+    for space_key in space_keys:
+        html_space_folder = os.path.join(html_folder, space_key)
+        md_space_folder = os.path.join(md_folder, space_key)
+        if not os.path.exists(md_space_folder):
+            os.makedirs(md_space_folder, exist_ok=True)
 
-            with open(html_path, 'r', encoding='utf-8') as f:
-                html_content = f.read()
-            
-            markdown_content = convert_html_to_md(html_content)
+        if not os.path.exists(html_space_folder):
+            print(f"⚠️ Pasta {html_space_folder} não encontrada, pulando...")
+            continue
 
-            with open(md_path, 'w', encoding='utf-8') as f:
-                f.write(markdown_content)
+        for filename in os.listdir(html_space_folder):
+            if filename.endswith('.html'):
+                html_path = os.path.join(html_space_folder, filename)
+                md_filename = filename.replace('.html', '.md')
+                md_path = os.path.join(md_space_folder, md_filename)
 
-            print(f"✅ {filename} convertido para Markdown e salvo em {md_path}")
+                with open(html_path, 'r', encoding='utf-8') as f:
+                    html_content = f.read()
+                
+                markdown_content = convert_html_to_md(html_content)
+
+                with open(md_path, 'w', encoding='utf-8') as f:
+                    f.write(markdown_content)

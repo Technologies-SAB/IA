@@ -33,4 +33,7 @@ if __name__ == "__main__":
         pages = download_all_pages(space_key)
         save_html(pages, space_key, save_folder)
         print(f"✅ {len(pages)} páginas salvas para o espaço {space_key} em {save_folder}/{space_key}")
-        proccess_html_files(save_folder, md_folder)
+        proccess_html_files(save_folder, md_folder, [space_key])
+        print(f"✅ Arquivos HTML processados e convertidos para Markdown em {md_folder}/{space_key}")
+
+    
