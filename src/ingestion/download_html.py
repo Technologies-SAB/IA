@@ -2,8 +2,10 @@ import os
 from src.config import settings
 from src.utils.save_html import save_html
 from src.utils.fetch_json import fetch_json
+from src.ingestion.html_to_md import proccess_html_files
 
 save_folder = settings.CONFLUENCE_SAVE_FOLDER
+md_folder = settings.CONFLUENCE_MD_FOLDER
 space_keys = settings.CONFLUENCE_SPACE_KEY
 
 os.makedirs(save_folder, exist_ok=True)
@@ -31,3 +33,4 @@ if __name__ == "__main__":
         pages = download_all_pages(space_key)
         save_html(pages, space_key, save_folder)
         print(f"✅ {len(pages)} páginas salvas para o espaço {space_key} em {save_folder}/{space_key}")
+        proccess_html_files(save_folder, md_folder)
