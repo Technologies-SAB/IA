@@ -10,3 +10,6 @@ tqdm
 
 beautifulsoup4
 html2text
+
+# Logging
+logging
