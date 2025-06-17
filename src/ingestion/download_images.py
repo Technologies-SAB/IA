@@ -3,6 +3,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from src.utils.fetch_json import fetch_json
 from src.config import settings
+from src.utils.clean_filename import sanitize_filename
 
 image_folder = settings.CONFLUENCE_IMAGES_FOLDER
 
@@ -36,3 +37,18 @@ def search_attachments(page_id):
     response.raise_for_status()
     return response.json()['results']
 
+def dowload_archive(attachment, space_key):
+    file_name = sanitize_filename(attachment['title'])
+    file_url = attachment['_links']['download']
+    file_path = os.path.join(image_folder, space_key, file_name)
+
+    if not os.path.exists(os.path.dirname(file_path)):
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+    response = requests.get(f"{settings.CONFLUENCE_URL}{file_url}", auth=auth)
+    response.raise_for_status()
+
+    with open(file_path, 'wb') as f:
+        f.write(response.content)
+    
+    print(f"✅ Imagem {file_name} baixada com sucesso em {file_path}")
