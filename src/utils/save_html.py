@@ -1,6 +1,19 @@
 import os
+import logging
 from tqdm import tqdm
 from src.utils.clean_filename import clean
+
+log_folder = "log"
+os.makedirs(log_folder, exist_ok=True)
+
+success_logger = logging.getLogger("save_html_success")
+error_logger = logging.getLogger("save_html_error")
+
+success_handler = logging.FileHandler(os.path.join(log_folder, "save_html_success.log"))
+error_handler = logging.FileHandler(os.path.join(log_folder, "save_html_error.log"))
+
+success_logger.addHandler(success_handler)
+error_logger.addHandler(error_handler)
 
 def save_html(pages, space_key, save_folder):
     
