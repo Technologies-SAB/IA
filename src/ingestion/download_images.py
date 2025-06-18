@@ -1,10 +1,12 @@
+import logging
 import os
 import requests
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from requests.auth import HTTPBasicAuth
+
 from src.utils.fetch_json import fetch_json
 from src.config import settings
 from src.utils.clean_filename import sanitize_filename
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 image_folder = settings.CONFLUENCE_IMAGES_FOLDER
 
@@ -12,6 +14,22 @@ if not os.path.exists(image_folder):
     os.makedirs(image_folder, exist_ok=True)
 
 auth = HTTPBasicAuth(settings.CONFLUENCE_USERNAME, settings.CONFLUENCE_API_TOKEN)
+
+log_folder = "log"
+os.makedirs(log_folder, exist_ok=True)
+
+logging.basicConfig(level=logging.INFO)
+success_logger = logging.getLogger("success")
+error_logger = logging.getLogger("error")
+timeout_logger = logging.getLogger("timeout")
+
+success_handler = logging.FileHandler(os.path.join(log_folder, "download_success.log"))
+error_handler = logging.FileHandler(os.path.join(log_folder, "download_error.log"))
+timeout_handler = logging.FileHandler(os.path.join(log_folder, "download_timeout.log"))
+
+success_logger.addHandler(success_handler)
+error_logger.addHandler(error_handler)
+timeout_logger.addHandler(timeout_handler)
 
 def listing_spaces(space_key):
     start = 0
@@ -52,7 +70,7 @@ def dowload_archive(attachment, space_key, page_title):
     if not os.path.exists(os.path.dirname(file_path)):
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-    response = requests.get(f"{settings.CONFLUENCE_URL}{file_url}", auth=auth)
+    response = requests.get(f"{settings.CONFLUENCE_URL}{file_url}", auth=auth, timeout=60)
     response.raise_for_status()
 
     with open(file_path, 'wb') as f:
