@@ -24,5 +24,9 @@ def save_html(pages, space_key, save_folder):
         page_folder = os.path.join(save_folder, space_key)
         os.makedirs(page_folder, exist_ok=True)
 
-        with open(f"{page_folder}/{title}.html", "w", encoding="utf-8") as f:
-            f.write(body_html)
+        try:
+            with open(f"{page_folder}/{title}.html", "w", encoding="utf-8") as f:
+                f.write(body_html)
+            success_logger.info(f"Página {title}.html salva com sucesso.")
+        except Exception as e:
+            error_logger.error(f"Erro ao salvar {title}.html: {e}")
