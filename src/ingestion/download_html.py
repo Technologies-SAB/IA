@@ -3,7 +3,7 @@ from src.config import settings
 from src.utils.save_html import save_html
 from src.utils.fetch_json import fetch_json
 from src.ingestion.html_to_md import proccess_html_files
-from src.ingestion.download_images import listing_spaces, search_attachments, dowload_archive
+from src.ingestion.download_images import listing_spaces, search_attachments, dowload_archive, download_attachments_batch
 
 save_folder = settings.CONFLUENCE_SAVE_FOLDER
 md_folder = settings.CONFLUENCE_MD_FOLDER
@@ -40,11 +40,9 @@ def download_confluence_pages():
         spaces = listing_spaces(space_key)
         for space in spaces:
             space_id = space['id']
+            space_title = space['title']
             attachments = search_attachments(space_id)
-            for attachment in attachments:
-                print(f"📥 A baixar anexo: {attachment['title']}")
-                # Uncomment the next line to enable downloading of attachments
-                dowload_archive(attachment, space_key)
+            download_attachments_batch(attachments, space_key, space_title)
 
         save_html(pages, space_key, save_folder)
         print(f"✅ {len(pages)} páginas salvas para o espaço {space_key} em {save_folder}/{space_key}")

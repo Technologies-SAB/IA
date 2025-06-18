@@ -4,6 +4,7 @@ from requests.auth import HTTPBasicAuth
 from src.utils.fetch_json import fetch_json
 from src.config import settings
 from src.utils.clean_filename import sanitize_filename
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 image_folder = settings.CONFLUENCE_IMAGES_FOLDER
 
@@ -37,10 +38,16 @@ def search_attachments(page_id):
     response.raise_for_status()
     return response.json()['results']
 
-def dowload_archive(attachment, space_key):
+def dowload_archive(attachment, space_key, page_title):
     file_name = sanitize_filename(attachment['title'])
+    subfolder = os.path.join(image_folder, space_key, sanitize_filename(page_title))
+
+    if not os.path.exists(subfolder):
+        os.makedirs(subfolder, exist_ok=True)
+
+    file_path = os.path.join(subfolder, file_name)
+    
     file_url = attachment['_links']['download']
-    file_path = os.path.join(image_folder, space_key, file_name)
 
     if not os.path.exists(os.path.dirname(file_path)):
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
@@ -50,5 +57,15 @@ def dowload_archive(attachment, space_key):
 
     with open(file_path, 'wb') as f:
         f.write(response.content)
-    
-    print(f"✅ Imagem {file_name} baixada com sucesso em {file_path}")
+
+def download_attachments_batch(attachments, space_key, page_title, max_workers=5):
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [
+            executor.submit(dowload_archive, attachment, space_key, page_title)
+            for attachment in attachments
+        ]
+        for future in as_completed(futures):
+            try:
+                future.result()
+            except Exception as e:
+                print(f"Erro ao baixar anexo: {e}")
