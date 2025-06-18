@@ -86,4 +86,4 @@ def download_attachments_batch(attachments, space_key, page_title, max_workers=5
             try:
                 future.result()
             except Exception as e:
-                print(f"Erro ao baixar anexo: {e}")
+                error_logger.error(f"Erro ao baixar anexo: {e}")

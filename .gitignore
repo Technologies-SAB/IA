@@ -2,4 +2,4 @@
 *.pyc
 data
 __pycache__
-conversion.log
+log
