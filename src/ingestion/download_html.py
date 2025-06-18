@@ -23,9 +23,12 @@ def download_all_pages(space_key):
         url = f"{base_url}/rest/api/content?spaceKey={space_key}&limit={limit}&start={start}&expand=body.storage"
         data = fetch_json(url, auth)
         pages.extend(data['results'])
+
         if 'size' in data and data['size'] < limit:
             break
+        
         start += limit
+    
     return pages
 
 def download_confluence_pages():
@@ -46,9 +49,7 @@ def download_confluence_pages():
 
         save_html(pages, space_key, save_folder)
         print(f"✅ {len(pages)} páginas salvas para o espaço {space_key} em {save_folder}/{space_key}")
-
         
-
         proccess_html_files(save_folder, md_folder, [space_key])
         print(f"✅ Arquivos HTML processados e convertidos para Markdown em {md_folder}/{space_key}")
 
