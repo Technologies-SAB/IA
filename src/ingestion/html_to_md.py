@@ -5,8 +5,17 @@ import html2text
 from src.config import settings
 from concurrent.futures import ThreadPoolExecutor
 
-# Configuração de logging
-logging.basicConfig(filename='conversion.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+log_folder = "log"
+os.makedirs(log_folder, exist_ok=True)
+
+success_logger = logging.getLogger("conversion_success")
+error_logger = logging.getLogger("conversion_error")
+
+success_handler = logging.FileHandler(os.path.join(log_folder, "conversion_success.log"))
+error_handler = logging.FileHandler(os.path.join(log_folder, "conversion_error.log"))
+
+success_logger.addHandler(success_handler)
+error_logger.addHandler(error_handler)
 
 def convert_html_to_md(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
