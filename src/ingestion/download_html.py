@@ -76,7 +76,7 @@ def download_confluence_pages():
             if filtered_attachments:
                 download_attachments_batch(filtered_attachments, space_key, space_title)
             else:
-                print(f"✅ Todos os anexos do espaço {space_title} já estão baixados.")
+                continue
 
         if new_pages:
             proccess_html_files(save_folder, md_folder, [space_key])
