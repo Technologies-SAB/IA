@@ -70,7 +70,7 @@ agente_ia_local/
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/agente_ia_local.git
+git clone https://github.com/Hospitality-Holding-Investments/IA.git
 cd agente_ia_local
 ```
 
