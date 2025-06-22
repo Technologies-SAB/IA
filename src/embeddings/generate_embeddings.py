@@ -24,6 +24,7 @@ def update_embedding(directory):
                     text = f.read()
                     vetor = embeder(text)
                     collection.add(
+                        ids=[path],
                         documents=[text],
                         metadatas=[{"path": path}],
                         embeddings=[vetor]
