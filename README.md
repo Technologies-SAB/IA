@@ -9,12 +9,19 @@ Desenvolver um chatbot de IA 100% local, que funcione diretamente via CPU em um 
 ## 🧩 Funcionalidades
 
 ✅ Execução 100% offline (sem chamadas externas) ██████████ 100%
+
 ✅ Treinamento com base em documentação interna (HTML → Markdown) ██████████ 100%
+
 ✅ Geração de embeddings locais com sentence-transformers ██████████ 100%
+
 ✅ Fine-tuning com LoRA usando peft █████░░░░░ 50%
+
 ✅ Recuperação semântica com RAG (FAISS ou ChromaDB) ██████░░░░ 60%
+
 ✅ Execução e correção de scripts SQL ░░░░░░░░░░ 0%
+
 ✅ Interpretação de imagens (OCR + descrição) ░░░░░░░░░░ 0%
+
 ✅ Interface de atendimento via chatbot (Streamlit, Gradio ou FastAPI) ░░░░░░░░░░ 0%
 
 ---
