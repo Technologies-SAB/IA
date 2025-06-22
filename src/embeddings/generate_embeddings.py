@@ -5,19 +5,15 @@ from chromadb.config import Settings as ChromaSettings
 from chromadb.utils import embedding_functions
 from src.config import settings
 
-chroma_client = chromadb.Client(
-    ChromaSettings(
-        chroma_db_impl="duckdb+parquet",
-        persist_directory=settings.CHROMA_DB_DIR
-    )
+chroma_client = chromadb.PersistentClient(
+    path=settings.CHROMA_DB_DIR,
 )
 
 collection = chroma_client.get_or_create_collection(
     name="confluence_embeddings"
 )
 
-model = SentenceTransformer(settings.MODEL_NAME)
-embeder = embedding_functions.SentenceTransformerEmbeddingFunction(model)
+embeder = embedding_functions.SentenceTransformerEmbeddingFunction(settings.MODEL_NAME)
 
 def update_embedding(directory):
     for root, _, files in os.walk(directory):
@@ -26,7 +22,7 @@ def update_embedding(directory):
                 path = os.path.join(root, file)
                 with open(path, 'r', encoding='utf-8') as f:
                     text = f.read()
-                    vetor = embeder.embed(text)
+                    vetor = embeder(text)
                     collection.add(
                         documents=[text],
                         metadatas=[{"path": path}],
