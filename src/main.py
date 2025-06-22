@@ -11,7 +11,7 @@ if __name__ == "__main__":
     # update_embedding(settings.EMBEDDINGS_DIR)
     # print("✅ Embeddings gerados e armazenados com sucesso no ChromaDB.")
 
-    embeder = SentenceTransformerEmbeddingFunction(settings.EMBEDDING_MODEL)
+    embeder = SentenceTransformerEmbeddingFunction(settings.MODEL_NAME)
     query = "Como fazer login?"
     results = search_similar_documents(query, embeder, top_k=8)
     print(results)
