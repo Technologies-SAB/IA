@@ -71,7 +71,7 @@ agente_ia_local/
 1. Clone o repositório:
 ```bash
 git clone https://github.com/Hospitality-Holding-Investments/IA.git
-cd agente_ia_local
+cd IA
 ```
 
 2. Crie um ambiente virtual:
