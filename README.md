@@ -10,7 +10,7 @@ Desenvolver um chatbot de IA 100% local, que funcione diretamente via CPU em um 
 
 - ✅ Execução 100% offline (sem chamadas externas) `██████████ 100%`
 - ✅ Treinamento com base em documentação interna (HTML → Markdown) `██████████ 100%`
-- ✅ Geração de embeddings locais com `sentence-transformers` `░░░░░░░░░░ 0%`
+- ✅ Geração de embeddings locais com `sentence-transformers` `██████████ 100%`
 - ✅ Recuperação semântica com RAG (FAISS ou ChromaDB) `░░░░░░░░░░ 0%`
 - ✅ Execução e correção de scripts SQL `░░░░░░░░░░ 0%`
 - ✅ Interpretação de imagens (OCR + descrição) `░░░░░░░░░░ 0%`
@@ -28,7 +28,7 @@ agente_ia_local/
 │   ├── markdown/              # Arquivos convertidos para .md        ██████████ 100%
 │   └── imagens/               # Tutoriais visuais e screenshots      ██████████ 100%
 │
-├── embeddings/                # Armazenamento de vetores e índices   ░░░░░░░░░░ 0%
+├── embeddings/                # Armazenamento de vetores e índices   ██████████ 100%
 │
 ├── models/                    # Modelos LLM locais (GGUF, LoRA, etc.) ░░░░░░░░░░ 0%
 │
@@ -40,7 +40,7 @@ agente_ia_local/
 │   ├── processing/            # Pré-processamento, segmentação, limpeza
 │   │   └── preprocess.py      #                                      ░░░░░░░░░░ 0%
 │   ├── embeddings/            # Geração e armazenamento de embeddings
-│   │   └── generate_embeddings.py #                                  ░░░░░░░░░░ 0%
+│   │   └── generate_embeddings.py #                                  ██████████ 100%
 │   ├── rag/                   # Implementação do pipeline RAG
 │   │   └── retriever.py       #                                      ░░░░░░░░░░ 0%
 │   ├── chatbot/               # Interface e lógica de interação
@@ -139,4 +139,4 @@ streamlit run src/chatbot/interface.py
 ---
 
 ## 📌 Licença
-Este projeto é de uso interno da empresa Hospitality Holding Investments, Lda.
+Este projeto é de uso interno da empresa Hospitality Holding Investments.
