@@ -8,13 +8,14 @@ Desenvolver um chatbot de IA 100% local, que funcione diretamente via CPU em um 
 
 ## 🧩 Funcionalidades
 
-- ✅ Execução 100% offline (sem chamadas externas) `██████████ 100%`
-- ✅ Treinamento com base em documentação interna (HTML → Markdown) `██████████ 100%`
-- ✅ Geração de embeddings locais com `sentence-transformers` `██████████ 100%`
-- ✅ Recuperação semântica com RAG (FAISS ou ChromaDB) `░░░░░░░░░░ 0%`
-- ✅ Execução e correção de scripts SQL `░░░░░░░░░░ 0%`
-- ✅ Interpretação de imagens (OCR + descrição) `░░░░░░░░░░ 0%`
-- ✅ Interface de atendimento via chatbot (Streamlit, Gradio ou FastAPI) `░░░░░░░░░░ 0%`
+✅ Execução 100% offline (sem chamadas externas) ██████████ 100%
+✅ Treinamento com base em documentação interna (HTML → Markdown) ██████████ 100%
+✅ Geração de embeddings locais com sentence-transformers ██████████ 100%
+✅ Fine-tuning com LoRA usando peft █████░░░░░ 50%
+✅ Recuperação semântica com RAG (FAISS ou ChromaDB) ██████░░░░ 60%
+✅ Execução e correção de scripts SQL ░░░░░░░░░░ 0%
+✅ Interpretação de imagens (OCR + descrição) ░░░░░░░░░░ 0%
+✅ Interface de atendimento via chatbot (Streamlit, Gradio ou FastAPI) ░░░░░░░░░░ 0%
 
 ---
 
@@ -30,8 +31,9 @@ agente_ia_local/
 │
 ├── embeddings/                # Armazenamento de vetores e índices   ██████████ 100%
 │
-├── models/                    # Modelos LLM locais (GGUF, LoRA, etc.) ░░░░░░░░░░ 0%
-│
+├── models/
+│   ├── base/                # Modelos LLM leves (GGUF, GPT2, etc.)   ░░░░░░░░░░ 0%
+│   └── finetuned_model/     # Modelos adaptados com LoRA             ░░░░░░░░░░ 0%
 ├── src/                       # Código-fonte principal
 │   ├── ingestion/             # Scripts de ingestão e conversão de dados
 │   │   ├── html_to_md.py      # Conversão HTML → Markdown            ██████████ 100%
@@ -42,7 +44,9 @@ agente_ia_local/
 │   ├── embeddings/            # Geração e armazenamento de embeddings
 │   │   └── generate_embeddings.py #                                  ██████████ 100%
 │   ├── rag/                   # Implementação do pipeline RAG
-│   │   └── retriever.py       #                                      ░░░░░░░░░░ 0%
+│   │   └── retriever.py                                              ░░░░░░░░░░ 0%
+│   ├── training/              # Fine-tuning com LoRA                 
+│   │   └──prepare_finetune_data.py                                   ░░░░░░░░░░ 0%
 │   ├── chatbot/               # Interface e lógica de interação
 │   │   ├── interface.py       # Streamlit, Gradio ou FastAPI         ░░░░░░░░░░ 0%
 │   │   └── responder.py       # Geração de respostas                 ░░░░░░░░░░ 0%
@@ -74,10 +78,13 @@ git clone https://github.com/Hospitality-Holding-Investments/IA.git
 cd IA
 ```
 
-2. Crie um ambiente virtual:
+2. Crie e ative um ambiente virtual:
 ```bash
 python3 -m venv venv
+# No Linux/Mac:
 source venv/bin/activate
+# No Windows:
+venv\Scripts\activate
 ```
 
 3. Instale as Dependências
@@ -116,7 +123,7 @@ streamlit run src/chatbot/interface.py
 
 • Python 3.10+
 
-• transformers, sentence-transformers
+• transformers, sentence-transformers, peft
 
 • langchain, faiss, chromadb
 
@@ -124,7 +131,7 @@ streamlit run src/chatbot/interface.py
 
 • streamlit, gradio, fastapi
 
-• pytesseract, Pillow
+• pytesseract, Pillow, BeautifulSoup
 
 ---
 
