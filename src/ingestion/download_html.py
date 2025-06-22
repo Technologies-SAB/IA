@@ -32,6 +32,8 @@ def download_all_pages(space_key):
     return pages
 
 def download_confluence_pages():
+    from src.utils.clean_filename import clean
+
     for space_key in space_keys:
         print(f"🔍 A buscar páginas para o espaço: {space_key}")
         pages = download_all_pages(space_key)
@@ -39,18 +41,46 @@ def download_confluence_pages():
         if not pages:
             print(f"⚠️ Nenhuma página encontrada para o espaço {space_key}.")
             continue
-        
+
+        new_pages = []
+        for page in pages:
+            title = clean(page['title'])
+            page_folder = os.path.join(save_folder, space_key)
+            os.makedirs(page_folder, exist_ok=True)
+            file_path = os.path.join(page_folder, f"{title}.html")
+            if not os.path.exists(file_path):
+                new_pages.append(page)
+
+        if new_pages:
+            save_html(new_pages, space_key, save_folder)
+            print(f"✅ {len(new_pages)} novas páginas salvas para o espaço {space_key} em {save_folder}/{space_key}")
+        else:
+            print(f"✅ Todas as páginas do espaço {space_key} já estão salvas.")
+
         spaces = listing_spaces(space_key)
         for space in spaces:
             space_id = space['id']
             space_title = space['title']
             attachments = search_attachments(space_id)
-            download_attachments_batch(attachments, space_key, space_title)
 
-        save_html(pages, space_key, save_folder)
-        print(f"✅ {len(pages)} páginas salvas para o espaço {space_key} em {save_folder}/{space_key}")
-        
-        proccess_html_files(save_folder, md_folder, [space_key])
-        print(f"✅ Arquivos HTML processados e convertidos para Markdown em {md_folder}/{space_key}")
+            from src.utils.clean_filename import sanitize_filename
+            from src.ingestion.download_images import image_folder
+            filtered_attachments = []
+            for attachment in attachments:
+                file_name = sanitize_filename(attachment['title'])
+                subfolder = os.path.join(image_folder, space_key, sanitize_filename(space_title))
+                file_path = os.path.join(subfolder, file_name)
+                if not os.path.exists(file_path):
+                    filtered_attachments.append(attachment)
 
-    
+            if filtered_attachments:
+                download_attachments_batch(filtered_attachments, space_key, space_title)
+            else:
+                print(f"✅ Todos os anexos do espaço {space_title} já estão baixados.")
+
+        if new_pages:
+            proccess_html_files(save_folder, md_folder, [space_key])
+            print(f"✅ Arquivos HTML processados e convertidos para Markdown em {md_folder}/{space_key}")
+        else:
+            print(f"✅ Todos os arquivos HTML do espaço {space_key} já foram convertidos.")
+
