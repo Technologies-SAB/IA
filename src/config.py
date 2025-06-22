@@ -16,6 +16,13 @@ class Settings(BaseSettings):
     CONFLUENCE_MD_FOLDER: str
     CONFLUENCE_IMAGES_FOLDER: str
 
+    # Configurações do banco de dados
+    CHROMA_DB_DIR: str
+
+    # Configuração do Embeddings
+    MODEL_NAME: str
+    EMBEDDINGS_DIR: str
+
     class Config:
         env_file = ".env"
 
