@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     MODEL_NAME: str
     EMBEDDINGS_DIR: str
 
+    # Configurações LLM
+    MODEL_DIR_BASE: str
+    LLM_NAME: str
+
     class Config:
         env_file = ".env"
 
