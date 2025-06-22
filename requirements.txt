@@ -1,15 +1,25 @@
 # Arquivo de dependências do projeto
 # Use este arquivo para instalar as dependências do projeto com pip
+
 pydantic
 pydantic_settings
 
+# HTTP Requests
 requests
 re
 
+# Data Processing
 tqdm
 
+# Web Scraping
 beautifulsoup4
 html2text
 
 # Logging
 logging
+
+# Embedding
+sentence-transformers
+
+# Vector Database
+chromadb

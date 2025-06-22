@@ -1,5 +1,5 @@
 import os
-from sentece_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer
 import chromadb
 from chromadb.config import Settings as ChromaSettings
 from chomadb.utils import embedding_functions
