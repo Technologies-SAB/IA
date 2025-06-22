@@ -2,7 +2,7 @@ import os
 from sentence_transformers import SentenceTransformer
 import chromadb
 from chromadb.config import Settings as ChromaSettings
-from chomadb.utils import embedding_functions
+from chromadb.utils import embedding_functions
 from src.config import settings
 
 chroma_client = chromadb.Client(
