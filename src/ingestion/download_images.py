@@ -4,9 +4,9 @@ import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from requests.auth import HTTPBasicAuth
 
-from src.utils.fetch_json import fetch_json
-from src.config import settings
-from src.utils.clean_filename import sanitize_filename
+from utils.fetch_json import fetch_json
+from config import settings
+from utils.clean_filename import sanitize_filename
 
 image_folder = settings.CONFLUENCE_IMAGES_FOLDER
 

@@ -2,7 +2,7 @@ import os
 import logging
 from bs4 import BeautifulSoup
 import html2text
-from src.config import settings
+from config import settings
 from concurrent.futures import ThreadPoolExecutor
 
 log_folder = "log"

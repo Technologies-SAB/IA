@@ -1,9 +1,9 @@
 import os
-from src.config import settings
-from src.utils.save_html import save_html
-from src.utils.fetch_json import fetch_json
-from src.ingestion.html_to_md import proccess_html_files
-from src.ingestion.download_images import listing_spaces, search_attachments, dowload_archive, download_attachments_batch
+from config import settings
+from utils.save_html import save_html
+from utils.fetch_json import fetch_json
+from ingestion.html_to_md import proccess_html_files
+from ingestion.download_images import listing_spaces, search_attachments, dowload_archive, download_attachments_batch
 
 save_folder = settings.CONFLUENCE_SAVE_FOLDER
 md_folder = settings.CONFLUENCE_MD_FOLDER
@@ -32,7 +32,7 @@ def download_all_pages(space_key):
     return pages
 
 def download_confluence_pages():
-    from src.utils.clean_filename import clean
+    from utils.clean_filename import clean
 
     for space_key in space_keys:
         print(f"🔍 A buscar páginas para o espaço: {space_key}")
@@ -63,8 +63,8 @@ def download_confluence_pages():
             space_title = space['title']
             attachments = search_attachments(space_id)
 
-            from src.utils.clean_filename import sanitize_filename
-            from src.ingestion.download_images import image_folder
+            from utils.clean_filename import sanitize_filename
+            from ingestion.download_images import image_folder
             filtered_attachments = []
             for attachment in attachments:
                 file_name = sanitize_filename(attachment['title'])

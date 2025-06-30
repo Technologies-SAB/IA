@@ -3,7 +3,7 @@ from sentence_transformers import SentenceTransformer
 import chromadb
 from chromadb.config import Settings as ChromaSettings
 from chromadb.utils import embedding_functions
-from src.config import settings
+from config import settings
 
 chroma_client = chromadb.PersistentClient(
     path=settings.CHROMA_DB_DIR,

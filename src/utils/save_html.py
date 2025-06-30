@@ -1,7 +1,7 @@
 import os
 import logging
 from tqdm import tqdm
-from src.utils.clean_filename import clean
+from utils.clean_filename import clean
 
 log_folder = "log"
 os.makedirs(log_folder, exist_ok=True)
