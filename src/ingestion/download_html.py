@@ -16,7 +16,7 @@ def download_all_pages(space_key):
     base_url = settings.CONFLUENCE_URL
 
     start = 0
-    limit = 1000
+    limit = 10000
     pages = []
 
     while True:
