@@ -6,7 +6,6 @@ pydantic_settings
 
 # HTTP Requests
 requests
-re
 
 # Data Processing
 tqdm
