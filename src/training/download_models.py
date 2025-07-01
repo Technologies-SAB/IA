@@ -1,7 +1,7 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from sentence_transformers import SentenceTransformer
 import os
-from src.config import settings
+from config import settings
 
 base_dir = settings.MODEL_DIR_BASE
 
