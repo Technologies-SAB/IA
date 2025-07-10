@@ -5,44 +5,59 @@ import pickle
 import faiss
 from sentence_transformers import SentenceTransformer
 from config import settings
+# Adicionar esta dependência se você ainda não tiver (pip install langchain)
+from langchain.text_splitter import RecursiveCharacterTextSplitter 
 
+# --- Configuração do logger ---
 logging.basicConfig(
     filename='embeddings.log',
-    filemode='w',
+    filemode='w', 
     format='%(asctime)s [%(levelname)s] %(message)s',
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
-logger.info(f"Carregando modelo de embedding: {settings.MODEL_NAME}")
-
-model_path = os.path.join(settings.MODEL_DIR_BASE, settings.MODEL_NAME)
-
-if not os.path.exists(model_path):
-    raise FileNotFoundError(f"Modelo de embeddings não encontrado em {model_path}. Execute download_models.py primeiro.")
-
-model = SentenceTransformer(model_path)
-
-logger.info("Modelo de embedding carregado com sucesso.")
+# REMOVEMOS O CARREGAMENTO DO MODELO DAQUI
 
 FAISS_INDEX_PATH = os.path.join(settings.EMBEDDINGS_DIR, 'faiss.index')
 FAISS_METADATA_PATH = os.path.join(settings.EMBEDDINGS_DIR, 'faiss_metadatas.pkl')
 
+# Função para dividir o texto em chunks (sem alterações)
 def text_splitter(text, chunk_size=300, chunk_overlap=50):
     """Divide o texto em chunks baseados em parágrafos para manter o contexto."""
-    from langchain.text_splitter import RecursiveCharacterTextSplitter
     
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
-        separators=["\n\n", "\n", " ", ""]
+        separators=["\n\n", "\n", " ", ""] # Prioriza quebras de parágrafo
     )
     return splitter.split_text(text)
 
+# NOVO: Função auxiliar para carregar o modelo apenas quando necessário
+def load_embedding_model():
+    logger.info(f"Carregando modelo de embedding: {settings.MODEL_NAME}")
+    model_path = os.path.join(settings.MODEL_DIR_BASE, settings.MODEL_NAME)
+    
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f"Modelo de embeddings não encontrado em {model_path}. Execute 'python main.py models' primeiro.")
+    
+    model = SentenceTransformer(model_path)
+    logger.info("Modelo de embedding carregado com sucesso.")
+    return model
+
 def update_embedding(md_directory):
+    # **CORREÇÃO**: Carregamos o modelo DENTRO da função
+    try:
+        model = load_embedding_model()
+    except FileNotFoundError as e:
+        logger.error(e)
+        print(f"ERRO: {e}")
+        return
+
     embeddings = []
     metadatas = []
     
+    # Garantir que os diretórios existam
     os.makedirs(settings.EMBEDDINGS_DIR, exist_ok=True)
 
     logger.info(f"Iniciando varredura de arquivos .md em: {md_directory}")
@@ -64,6 +79,7 @@ def update_embedding(md_directory):
                 logger.warning(f"Nenhum chunk de texto gerado para: {path}")
                 continue
 
+            # Gera embedding para cada chunk (usando o modelo carregado)
             chunk_embeddings = model.encode(chunks)
             
             for i, chunk in enumerate(chunks):
@@ -85,10 +101,12 @@ def update_embedding(md_directory):
         
     arr = np.array(embeddings).astype('float32')
     
+    # Salvar metadados com o texto do chunk
     with open(FAISS_METADATA_PATH, 'wb') as f:
         pickle.dump(metadatas, f)
     logger.info(f"Metadados salvos em {FAISS_METADATA_PATH}")
 
+    # Criar e salvar índice FAISS
     if len(arr) > 0:
         dimension = arr.shape[1]
         index = faiss.IndexFlatL2(dimension)
