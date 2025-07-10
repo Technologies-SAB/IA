@@ -21,4 +21,7 @@ logging
 sentence-transformers
 
 # Vector Database
-chromadb
+faiss-cpu
+
+# LangChain
+langchain

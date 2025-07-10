@@ -56,7 +56,7 @@ agente_ia_local/
 │   │   └──prepare_finetune_data.py                                   ░░░░░░░░░░ 0%
 │   ├── chatbot/               # Interface e lógica de interação
 │   │   ├── interface.py       # Streamlit, Gradio ou FastAPI         ░░░░░░░░░░ 0%
-│   │   └── responder.py       # Geração de respostas                 ░░░░░░░░░░ 0%
+│   │   └── response.py       # Geração de respostas                 ░░░░░░░░░░ 0%
 │   ├── images/                # OCR e descrição de imagens
 │   │   └── image_parser.py    #                                      ░░░░░░░░░░ 0%
 │   ├── utils/                 # Utilitários gerais                   ██████████ 100%
