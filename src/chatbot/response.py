@@ -1,25 +1,72 @@
 import os
-from src.embedding.generate_embeddings import buscar_similares_faiss
+from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 from config import settings
-from transformers import AutoModelForCausalLM, AutoTokenizer
-import torch
+from rag.retriever import FaissRetriever # Importamos nosso retriever
 
-# Carrega o modelo LLM e o tokenizer
-MODEL_PATH = settings.MODEL_DIR_BASE  # ajuste se necess�rio
-model = AutoModelForCausalLM.from_pretrained(MODEL_PATH)
-tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
+class Chatbot:
+    def __init__(self):
+        self.retriever = FaissRetriever()
 
-def quest_response(pergunta, top_k=3, max_tokens=500):
-    # 1. Buscar documentos relevantes via FAISS
-    docs = buscar_similares_faiss(pergunta, top_k=top_k)
-    contexto = "\n".join([open(doc['path'], encoding='utf-8').read() for doc in docs if os.path.exists(doc['path'])])
-    # 2. Montar prompt com contexto
-    prompt = f"Contexto:\n{contexto}\n\nPergunta: {pergunta}\nResposta:"
-    # 3. Gerar resposta com o LLM
-    inputs = tokenizer(prompt, return_tensors="pt", truncation=True)
-    with torch.no_grad():
-        outputs = model.generate(**inputs, max_new_tokens=max_tokens, do_sample=True)
-    resposta = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    # Retorna apenas a resposta ap�s o prompt
-    resposta_final = resposta.split("Resposta:", 1)[-1].strip()
-    return resposta_final
+        llm_path = os.path.join(settings.MODEL_DIR_BASE, settings.LLM_NAME)
+        if not os.path.exists(llm_path):
+            raise FileNotFoundError(f"Modelo LLM não encontrado em {llm_path}. Execute download_models.py primeiro.")
+        
+        print("Carregando o modelo LLM local... Isso pode levar alguns minutos.")
+        
+        tokenizer = AutoTokenizer.from_pretrained(llm_path)
+        model = AutoModelForCausalLM.from_pretrained(llm_path)
+
+        self.llm_pipeline = pipeline(
+            "text-generation",
+            model=model,
+            tokenizer=tokenizer,
+            max_new_tokens=512,  
+            device=-1 # Use -1 para CPU, ou 0 para GPU se disponível
+        )
+        print("Chatbot pronto para uso.")
+
+    def _build_prompt(self, query: str, context: list[dict]) -> str:
+        """
+        Constrói o prompt final para o LLM, combinando a pergunta com o contexto recuperado.
+        """
+        context_text = "\n\n---\n\n".join([item['text'] for item in context])
+
+        # Este template de prompt é crucial para obter boas respostas!
+        prompt_template = f"""
+Você é um assistente especialista na documentação da empresa Hospitality Holding Investments.
+Sua tarefa é responder à pergunta do usuário de forma precisa e concisa, baseando-se exclusivamente no CONTEXTO fornecido.
+Se a informação não estiver no contexto, responda educadamente que você não possui essa informação e que será necessário abrir um ticket para o suporte.
+Gere scripts SQL apenas se o contexto contiver esquemas de tabelas e a pergunta pedir explicitamente por um.
+
+CONTEXTO:
+{context_text}
+
+PERGUNTA DO USUÁRIO:
+{query}
+
+RESPOSTA:
+"""
+        return prompt_template
+
+    def answer(self, query: str):
+        # Passo 1: Recuperar (Retrieve)
+        context_chunks = self.retriever.search(query, top_k=3)
+        
+        if not context_chunks:
+            return "Não encontrei informações relevantes na documentação para responder a sua pergunta."
+
+        # Passo 2: Aumentar (Augment)
+        prompt = self._build_prompt(query, context_chunks)
+        
+        print("\n--- PROMPT ENVIADO PARA O LLM ---\n")
+        print(prompt)
+        print("\n--- GERANDO RESPOSTA... ---\n")
+
+        # Passo 3: Gerar (Generate)
+        generated_output = self.llm_pipeline(prompt)
+        response = generated_output[0]['generated_text']
+        
+        # Limpa a resposta para remover o prompt inicial
+        final_response = response.split("RESPOSTA:")[-1].strip()
+        
+        return final_response
