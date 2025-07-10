@@ -24,7 +24,7 @@ def download_all_pages(space_key):
         data = fetch_json(url, auth)
         pages.extend(data['results'])
 
-        if 'size' in data and data['size'] < limit:
+        if not data['results']:
             break
         
         start += limit
