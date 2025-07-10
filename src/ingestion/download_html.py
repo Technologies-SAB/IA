@@ -16,19 +16,33 @@ def download_all_pages(space_key):
     base_url = settings.CONFLUENCE_URL
 
     start = 0
-    limit = 100000
+    limit = 100
     pages = []
+    
+    print(f"Iniciando download paginado para o espaço '{space_key}'...")
 
     while True:
         url = f"{base_url}/rest/api/content?spaceKey={space_key}&limit={limit}&start={start}&expand=body.storage"
+        print(f"Buscando páginas: start={start}, limit={limit}")
+        
         data = fetch_json(url, auth)
-        pages.extend(data['results'])
-
-        if not data['results']:
+        results = data.get('results', [])
+        
+        if not results:
+            print("Nenhuma página adicional encontrada. Finalizando busca.")
             break
         
-        start += limit
+        pages.extend(results)
+        num_results = len(results)
+        print(f"Recebidas {num_results} páginas. Total acumulado: {len(pages)}")
+
+        if num_results < limit:
+            print("Esta foi a última página de resultados.")
+            break
+
+        start += num_results
     
+    print(f"Download concluído. Total de {len(pages)} páginas baixadas para o espaço '{space_key}'.")
     return pages
 
 def download_confluence_pages():
