@@ -6,7 +6,7 @@ from config import settings
 base_dir = settings.MODEL_DIR_BASE
 
 def download_embeddings_model():
-    embeddings_model_name = "sentence-transformers/all-MiniLM-L6-v2"
+    embeddings_model_name = "all-MiniLM-L6-v2"
     model_path = os.path.join(base_dir, embeddings_model_name)
     if os.path.exists(model_path) and os.listdir(model_path):
         print(f"Modelo de embeddings já existe em {model_path}, pulando download.")
