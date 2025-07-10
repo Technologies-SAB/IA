@@ -1,89 +1,97 @@
 import os
 import numpy as np
 import logging
-from sentence_transformers import SentenceTransformer
 import pickle
-from config import settings
 import faiss
+from sentence_transformers import SentenceTransformer
+from config import settings
 
-# Configuração do logger
 logging.basicConfig(
     filename='embeddings.log',
-    filemode='a',
+    filemode='w',
     format='%(asctime)s [%(levelname)s] %(message)s',
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
-# Carrega o modelo de embeddings
-model = SentenceTransformer(settings.MODEL_NAME)
+logger.info(f"Carregando modelo de embedding: {settings.MODEL_NAME}")
+
+model_path = os.path.join(settings.MODEL_DIR_BASE, settings.MODEL_NAME)
+
+if not os.path.exists(model_path):
+    raise FileNotFoundError(f"Modelo de embeddings não encontrado em {model_path}. Execute download_models.py primeiro.")
+
+model = SentenceTransformer(model_path)
+
+logger.info("Modelo de embedding carregado com sucesso.")
 
 FAISS_INDEX_PATH = os.path.join(settings.EMBEDDINGS_DIR, 'faiss.index')
 FAISS_METADATA_PATH = os.path.join(settings.EMBEDDINGS_DIR, 'faiss_metadatas.pkl')
 
-# Novo método: gerar e salvar embeddings localmente (em .pkl e FAISS)
-def update_embedding(directory):
-    found = False
+def text_splitter(text, chunk_size=300, chunk_overlap=50):
+    """Divide o texto em chunks baseados em parágrafos para manter o contexto."""
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
+    
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        separators=["\n\n", "\n", " ", ""]
+    )
+    return splitter.split_text(text)
+
+def update_embedding(md_directory):
     embeddings = []
     metadatas = []
-    for root, _, files in os.walk(directory):
-        for file in files:
-            if file.endswith(".md"):
-                found = True
-                path = os.path.join(root, file)
-                try:
-                    with open(path, 'r', encoding='utf-8') as f:
-                        text = f.read()
-                        vetor = model.encode(text)
-                        embeddings.append(vetor)
-                        metadatas.append({"path": path})
-                        logger.info(f"✔ Embedding gerado para: {path}")
-                except Exception as e:
-                    logger.error(f"Erro ao processar {path}: {e}")
-    if not found:
+    
+    os.makedirs(settings.EMBEDDINGS_DIR, exist_ok=True)
+
+    logger.info(f"Iniciando varredura de arquivos .md em: {md_directory}")
+    
+    all_files = [os.path.join(root, file) for root, _, files in os.walk(md_directory) for file in files if file.endswith(".md")]
+
+    if not all_files:
         logger.warning("Nenhum arquivo .md encontrado!")
-    else:
-        arr = np.array(embeddings).astype('float32')
-        np.save(os.path.join(settings.EMBEDDINGS_DIR, 'embeddings.npy'), arr)
-        with open(os.path.join(settings.EMBEDDINGS_DIR, 'metadatas.pkl'), 'wb') as f:
-            pickle.dump(metadatas, f)
-        logger.info(f"Total de embeddings salvos: {len(embeddings)}")
-        # FAISS
-        if len(arr) > 0:
-            index = faiss.IndexFlatL2(arr.shape[1])
-            index.add(arr)
-            faiss.write_index(index, FAISS_INDEX_PATH)
-            with open(FAISS_METADATA_PATH, 'wb') as f:
-                pickle.dump(metadatas, f)
-            logger.info(f"Índice FAISS salvo com {index.ntotal} vetores.")
+        return
 
-# Novo método: listar documentos dos embeddings salvos localmente
-def listar_documentos_local(n=5):
-    try:
-        with open(os.path.join(settings.EMBEDDINGS_DIR, 'metadatas.pkl'), 'rb') as f:
-            metadatas = pickle.load(f)
-        count = len(metadatas)
-        logger.info(f"Total de documentos salvos: {count}")
-        for i, meta in enumerate(metadatas[:n]):
-            logger.info(f"Documento {i+1}: Caminho: {meta['path']}")
-    except Exception as e:
-        logger.warning(f"Não foi possível listar documentos locais: {e}")
+    for path in all_files:
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                full_text = f.read()
+            
+            chunks = text_splitter(full_text)
+            
+            if not chunks:
+                logger.warning(f"Nenhum chunk de texto gerado para: {path}")
+                continue
 
-# Função para buscar documentos similares usando FAISS
-def buscar_similares_faiss(query, top_k=5):
-    if not os.path.exists(FAISS_INDEX_PATH) or not os.path.exists(FAISS_METADATA_PATH):
-        logger.error("Índice FAISS ou metadados não encontrados.")
-        return []
-    index = faiss.read_index(FAISS_INDEX_PATH)
-    with open(FAISS_METADATA_PATH, 'rb') as f:
-        metadatas = pickle.load(f)
-    query_vec = model.encode([query]).astype('float32')
-    D, I = index.search(query_vec, top_k)
-    resultados = []
-    for idx, dist in zip(I[0], D[0]):
-        if idx < len(metadatas):
-            resultados.append({
-                'path': metadatas[idx]['path'],
-                'distancia': float(dist)
-            })
-    return resultados
+            chunk_embeddings = model.encode(chunks)
+            
+            for i, chunk in enumerate(chunks):
+                embeddings.append(chunk_embeddings[i])
+                metadatas.append({
+                    "source": path,
+                    "chunk_id": i,
+                    "text": chunk
+                })
+            
+            logger.info(f"✔ {len(chunks)} embeddings gerados para: {path}")
+
+        except Exception as e:
+            logger.error(f"Erro ao processar {path}: {e}")
+
+    if not embeddings:
+        logger.warning("Nenhum embedding foi gerado.")
+        return
+        
+    arr = np.array(embeddings).astype('float32')
+    
+    with open(FAISS_METADATA_PATH, 'wb') as f:
+        pickle.dump(metadatas, f)
+    logger.info(f"Metadados salvos em {FAISS_METADATA_PATH}")
+
+    if len(arr) > 0:
+        dimension = arr.shape[1]
+        index = faiss.IndexFlatL2(dimension)
+        index.add(arr)
+        faiss.write_index(index, FAISS_INDEX_PATH)
+        logger.info(f"Índice FAISS salvo em {FAISS_INDEX_PATH} com {index.ntotal} vetores.")
