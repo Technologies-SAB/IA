@@ -25,7 +25,8 @@ class Settings(BaseSettings):
 
     # Configurações LLM
     MODEL_DIR_BASE: str
-    LLM_NAME: str
+    LLM_NAME: str = "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
+    LLM_REPO_ID: str
 
     class Config:
         env_file = ".env"
