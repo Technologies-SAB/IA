@@ -53,20 +53,3 @@ class FaissRetriever:
         
         logger.debug(f"Encontrados {len(resultados)} resultados.")
         return resultados
-
-# Exemplo de uso (pode ser executado para testar)
-if __name__ == '__main__':
-    try:
-        retriever = FaissRetriever()
-        query = "Qual o procedimento para check-in?"
-        resultados = retriever.search(query, top_k=3)
-        
-        print(f"Resultados da busca para: '{query}'\n")
-        for res in resultados:
-            print(f"--- Fonte: {res['source']} ---")
-            print(res['text'])
-            print(f"(Distância: {res['distance']:.4f})\n")
-            
-    except FileNotFoundError as e:
-        print(f"Erro: {e}")
-        print("Certifique-se de executar o script `generate_embeddings.py` primeiro.")
