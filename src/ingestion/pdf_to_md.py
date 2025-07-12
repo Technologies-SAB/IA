@@ -16,7 +16,8 @@ def convert_pdf_to_md():
         if not os.path.isdir(space_pdf_folder):
             continue
 
-        pdf_to_md_folder = os.path.join(settings.MD_FOLDER, space_key)
+        pdf_to_md_folder = os.path.join(pdf_to_md_folder, space_key)
+        
         os.makedirs(pdf_to_md_folder, exist_ok=True)
 
         pdf_files = [f for f in os.listdir(space_pdf_folder) if f.endswith(".pdf")]
