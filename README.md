@@ -16,7 +16,7 @@ Desenvolver um chatbot de IA 100% local, que funcione diretamente via CPU em um 
 
 ✅ Fine-tuning com LoRA usando peft █████░░░░░ 50%
 
-✅ Recuperação semântica com RAG (FAISS ou ChromaDB) ██████░░░░ 60%
+✅ Recuperação semântica com RAG (FAISS ou ChromaDB) ██████████ 100%
 
 ✅ Execução e correção de scripts SQL ░░░░░░░░░░ 0%
 
@@ -51,12 +51,12 @@ agente_ia_local/
 │   ├── embeddings/            # Geração e armazenamento de embeddings
 │   │   └── generate_embeddings.py #                                  ██████████ 100%
 │   ├── rag/                   # Implementação do pipeline RAG
-│   │   └── retriever.py                                              ░░░░░░░░░░ 0%
+│   │   └── retriever.py                                              ██████████ 100%
 │   ├── training/              # Fine-tuning com LoRA                 
 │   │   └──prepare_finetune_data.py                                   ░░░░░░░░░░ 0%
 │   ├── chatbot/               # Interface e lógica de interação
 │   │   ├── interface.py       # Streamlit, Gradio ou FastAPI         ░░░░░░░░░░ 0%
-│   │   └── response.py       # Geração de respostas                 ░░░░░░░░░░ 0%
+│   │   └── response.py       # Geração de respostas                  ███████░░░ 7%
 │   ├── images/                # OCR e descrição de imagens
 │   │   └── image_parser.py    #                                      ░░░░░░░░░░ 0%
 │   ├── utils/                 # Utilitários gerais                   ██████████ 100%
@@ -153,4 +153,4 @@ streamlit run src/chatbot/interface.py
 ---
 
 ## 📌 Licença
-Este projeto é de uso interno da empresa Hospitality Holding Investments.
+Este projeto é de uso interno da empresa Hospitality Holding Investments de propriedade da SAB.
