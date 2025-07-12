@@ -25,3 +25,26 @@ faiss-cpu
 
 # LangChain
 langchain
+llama-cpp-python
+
+# LangChain for LLMs
+langchain-llms
+
+# Hugging Face
+transformers
+huggingface-hub
+
+# LangChain Community
+langchain-community
+
+# FastAPI for serving the LLM
+fastapi
+
+# Uvicorn for serving the FastAPI app
+uvicorn
+
+# Unstructured for document processing
+unstructured
+
+# LayoutParser for document layout analysis
+layoutparser
