@@ -1,7 +1,8 @@
+from rag.retriever import FaissRetriever
 from ingestion.download_html import download_confluence_pages
 from embedding.generate_embeddings import update_embedding
 from training.download_models import download_embeddings_model, download_llm_model
-from chatbot.response import Chatbot # Importa a classe do chatbot
+from chatbot.response import Chatbot
 from config import settings
 import sys
 
@@ -24,7 +25,8 @@ def run_pipeline(step):
         print("✅ Modelos baixados e salvos com sucesso.")
 
     elif step == 'chat':
-        print("--- PASSO 4: INICIANDO CHATBOT ---")
+        print("--- INICIANDO CLIENTE DO CHATBOT ---")
+        print("Certifique-se de que o servidor do LLM está rodando em outro terminal.")
         try:
             bot = Chatbot()
             print("\n\nChatbot iniciado. Digite 'sair' para terminar.")
@@ -34,14 +36,10 @@ def run_pipeline(step):
                     break
                 response = bot.answer(query)
                 print(f"Assistente: {response}")
-        except FileNotFoundError as e:
-            print(f"\nERRO: {e}")
-            print("Certifique-se de ter executado os passos 'models' e 'embed' primeiro.")
         except Exception as e:
             print(f"Ocorreu um erro inesperado: {e}")
-
     else:
-        print("Argumento inválido. Use 'download', 'embed', 'models' ou 'chat'.")
+        print(f"Opção '{step}' não implementada neste fluxo simplificado.")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
