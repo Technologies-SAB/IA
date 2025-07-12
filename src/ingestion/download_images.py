@@ -8,7 +8,7 @@ from utils.fetch_json import fetch_json
 from config import settings
 from utils.clean_filename import sanitize_filename
 
-image_folder = settings.CONFLUENCE_IMAGES_FOLDER
+image_folder = settings.IMAGES_FOLDER
 
 if not os.path.exists(image_folder):
     os.makedirs(image_folder, exist_ok=True)

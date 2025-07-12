@@ -15,7 +15,7 @@ def run_pipeline(step):
     elif step == 'embed':
         print("--- PASSO 2: GERANDO EMBEDDINGS ---")
         # Passamos o diretório correto dos arquivos .md
-        update_embedding(settings.CONFLUENCE_MD_FOLDER)
+        update_embedding(settings.MD_FOLDER)
         print("✅ Embeddings gerados e salvos localmente.")
 
     elif step == 'models':

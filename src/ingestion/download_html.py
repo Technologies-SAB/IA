@@ -6,7 +6,7 @@ from ingestion.html_to_md import proccess_html_files
 from ingestion.download_images import listing_spaces, search_attachments, dowload_archive, download_attachments_batch
 
 save_folder = settings.CONFLUENCE_SAVE_FOLDER
-md_folder = settings.CONFLUENCE_MD_FOLDER
+md_folder = settings.MD_FOLDER
 space_keys = settings.CONFLUENCE_SPACE_KEY
 
 os.makedirs(save_folder, exist_ok=True)

@@ -13,8 +13,10 @@ class Settings(BaseSettings):
 
     # Caminho para guardar os documentos
     CONFLUENCE_SAVE_FOLDER: str
-    CONFLUENCE_MD_FOLDER: str
-    CONFLUENCE_IMAGES_FOLDER: str
+    IMAGES_FOLDER: str
+    MD_FOLDER: str
+    PDF_DIR: str
+
 
     # Configurações do banco de dados
     CHROMA_DB_DIR: str
