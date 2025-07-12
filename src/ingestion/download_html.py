@@ -1,100 +1,81 @@
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from tqdm import tqdm
 from config import settings
 from utils.save_html import save_html
 from utils.fetch_json import fetch_json
-from ingestion.html_to_md import proccess_html_files
-from ingestion.download_images import listing_spaces, search_attachments, dowload_archive, download_attachments_batch
+from utils.clean_filename import clean, sanitize_filename
+from ingestion.download_images import search_attachments, download_attachments_batch
 
-save_folder = settings.CONFLUENCE_SAVE_FOLDER
-md_folder = settings.MD_FOLDER
-space_keys = settings.CONFLUENCE_SPACE_KEY
-
-os.makedirs(save_folder, exist_ok=True)
+HTML_SAVE_FOLDER = settings.CONFLUENCE_SAVE_FOLDER
+ATTACHMENTS_FOLDER = settings.IMAGES_FOLDER # Vamos tratar tudo como anexo
+SPACE_KEYS = settings.CONFLUENCE_SPACE_KEY
 
 def download_all_pages(space_key):
     auth = (settings.CONFLUENCE_USERNAME, settings.CONFLUENCE_API_TOKEN)
     base_url = settings.CONFLUENCE_URL
-
     start = 0
     limit = 100
     pages = []
     
-    print(f"Iniciando download paginado para o espaço '{space_key}'...")
-
+    print(f"Buscando metadados das páginas para o espaço '{space_key}'...")
     while True:
         url = f"{base_url}/rest/api/content?spaceKey={space_key}&limit={limit}&start={start}&expand=body.storage"
-        print(f"Buscando páginas: start={start}, limit={limit}")
-        
         data = fetch_json(url, auth)
         results = data.get('results', [])
         
-        if not results:
-            print("Nenhuma página adicional encontrada. Finalizando busca.")
-            break
+        if not results: break
         
         pages.extend(results)
-        num_results = len(results)
-        print(f"Recebidas {num_results} páginas. Total acumulado: {len(pages)}")
-
-        if num_results < limit:
-            print("Esta foi a última página de resultados.")
-            break
-
-        start += num_results
-    
-    print(f"Download concluído. Total de {len(pages)} páginas baixadas para o espaço '{space_key}'.")
+        if len(results) < limit: break
+        start += len(results)
+        
+    print(f"Encontradas {len(pages)} páginas no espaço '{space_key}'.")
     return pages
 
-def download_confluence_pages():
-    from utils.clean_filename import clean
-
-    for space_key in space_keys:
-        print(f"🔍 A buscar páginas para o espaço: {space_key}")
-        pages = download_all_pages(space_key)
+def download_all_attachments_for_space(pages, space_key):
+    print(f"\nBuscando todos os anexos para o espaço '{space_key}'...")
+    all_attachments_to_download = []
+    
+    for page in tqdm(pages, desc=f"Verificando anexos de {space_key}"):
+        page_id = page['id']
+        page_title = clean(page['title'])
         
+        try:
+            attachments = search_attachments(page_id)
+            for attachment in attachments:
+                attachment['page_title'] = page_title
+                
+                file_name = sanitize_filename(attachment['title'])
+                subfolder = os.path.join(ATTACHMENTS_FOLDER, space_key, sanitize_filename(page_title))
+                file_path = os.path.join(subfolder, file_name)
+                
+                if not os.path.exists(file_path):
+                    all_attachments_to_download.append(attachment)
+        except Exception as e:
+            print(f"Erro ao buscar anexos para a página '{page_title}': {e}")
+            
+    if not all_attachments_to_download:
+        print(f"✅ Todos os anexos para o espaço '{space_key}' já estão baixados.")
+        return
+
+    print(f"\nBaixando {len(all_attachments_to_download)} novos anexos para o espaço '{space_key}'...")
+    download_attachments_batch(all_attachments_to_download, space_key)
+
+
+def download_confluence_content():
+    os.makedirs(HTML_SAVE_FOLDER, exist_ok=True)
+    os.makedirs(ATTACHMENTS_FOLDER, exist_ok=True)
+    
+    for space_key in SPACE_KEYS:
+        print(f"\n--- Processando espaço: {space_key} ---")
+        
+        pages = download_all_pages(space_key)
         if not pages:
             print(f"⚠️ Nenhuma página encontrada para o espaço {space_key}.")
             continue
-
-        new_pages = []
-        for page in pages:
-            title = clean(page['title'])
-            page_folder = os.path.join(save_folder, space_key)
-            os.makedirs(page_folder, exist_ok=True)
-            file_path = os.path.join(page_folder, f"{title}.html")
-            if not os.path.exists(file_path):
-                new_pages.append(page)
-
-        if new_pages:
-            save_html(new_pages, space_key, save_folder)
-            print(f"✅ {len(new_pages)} novas páginas salvas para o espaço {space_key} em {save_folder}/{space_key}")
-        else:
-            print(f"✅ Todas as páginas do espaço {space_key} já estão salvas.")
-
-        spaces = listing_spaces(space_key)
-        for space in spaces:
-            space_id = space['id']
-            space_title = space['title']
-            attachments = search_attachments(space_id)
-
-            from utils.clean_filename import sanitize_filename
-            from ingestion.download_images import image_folder
-            filtered_attachments = []
-            for attachment in attachments:
-                file_name = sanitize_filename(attachment['title'])
-                subfolder = os.path.join(image_folder, space_key, sanitize_filename(space_title))
-                file_path = os.path.join(subfolder, file_name)
-                if not os.path.exists(file_path):
-                    filtered_attachments.append(attachment)
-
-            if filtered_attachments:
-                download_attachments_batch(filtered_attachments, space_key, space_title)
-            else:
-                continue
-
-        if new_pages:
-            proccess_html_files(save_folder, md_folder, [space_key])
-            print(f"✅ Arquivos HTML processados e convertidos para Markdown em {md_folder}/{space_key}")
-        else:
-            print(f"✅ Todos os arquivos HTML do espaço {space_key} já foram convertidos.")
-
+        
+        save_html(pages, space_key, HTML_SAVE_FOLDER)
+        print(f"✅ {len(pages)} páginas HTML salvas para o espaço {space_key}.")
+        
+        download_all_attachments_for_space(pages, space_key)
