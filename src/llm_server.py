@@ -13,7 +13,7 @@ if not os.path.exists(llm_path):
 
 print("Carregando o modelo LLM... Este processo pode levar vários minutos.")
 llm = LlamaCpp(
-    model_path=llm_path, n_ctx=4096, n_gpu_layers=0, temperature=0.1,
+    model_path=llm_path, n_ctx=4096, n_gpu_layers=0, temperature=0.9,
     max_tokens=512, stop=["</s>", "[/INST]"], n_threads=4, verbose=False
 )
 print("✅ Modelo LLM carregado e pronto para receber requisições.")
