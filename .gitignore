@@ -10,3 +10,4 @@ models
 /.vs/slnx.sqlite
 /.vs/ProjectSettings.json
 .venv
+*.log
