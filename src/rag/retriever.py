@@ -6,6 +6,7 @@ import logging
 from sentence_transformers import SentenceTransformer
 from config import settings
 
+
 logger = logging.getLogger(__name__)
 
 class FaissRetriever:
@@ -33,16 +34,12 @@ class FaissRetriever:
         """
         logger.debug(f"Buscando por: '{query}' com top_k={top_k}")
         
-        # 1. Gerar o embedding da query
         query_vec = self.model.encode([query]).astype('float32')
         
-        # 2. Buscar no FAISS
         distances, indices = self.index.search(query_vec, top_k)
         
-        # 3. Montar os resultados com o texto dos chunks
         resultados = []
         for idx, dist in zip(indices[0], distances[0]):
-            # FAISS pode retornar -1 se não encontrar vizinhos suficientes
             if idx != -1:
                 metadata = self.metadatas[idx]
                 resultados.append({
