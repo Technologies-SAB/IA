@@ -1,53 +1,68 @@
 import os
-import logging
-from bs4 import BeautifulSoup
 import html2text
+from bs4 import BeautifulSoup
+from urllib.parse import urlparse
+from tqdm import tqdm
+
 from config import settings
-from concurrent.futures import ThreadPoolExecutor
+from utils.clean_filename import clean, sanitize_filename
 
-log_folder = "log"
-os.makedirs(log_folder, exist_ok=True)
+HTML_FOLDER = settings.CONFLUENCE_SAVE_FOLDER
+ATTACHMENTS_FOLDER = settings.IMAGES_FOLDER
+MD_FOLDER = settings.MD_FOLDER
 
-success_logger = logging.getLogger("conversion_success")
-error_logger = logging.getLogger("conversion_error")
+def process_and_convert_to_md():
+    os.makedirs(MD_FOLDER, exist_ok=True)
+    
+    skipped_empty_count = 0
 
-success_handler = logging.FileHandler(os.path.join(log_folder, "conversion_success.log"))
-error_handler = logging.FileHandler(os.path.join(log_folder, "conversion_error.log"))
+    for space_key in os.listdir(HTML_FOLDER):
+        html_space_folder = os.path.join(HTML_FOLDER, space_key)
+        if not os.path.isdir(html_space_folder): continue
 
-success_logger.addHandler(success_handler)
-error_logger.addHandler(error_handler)
+        md_space_folder = os.path.join(MD_FOLDER, space_key)
+        os.makedirs(md_space_folder, exist_ok=True)
 
-def convert_html_to_md(html_content):
-    soup = BeautifulSoup(html_content, 'html.parser')
-    markdown = html2text.html2text(str(soup))
-    return markdown
+        html_files = [f for f in os.listdir(html_space_folder) if f.endswith('.html')]
 
-def proccess_html_files(html_folder, md_folder, space_keys):
-    try:
-        if not os.path.exists(md_folder):
-            os.makedirs(md_folder, exist_ok=True)
+        print(f"\nProcessando HTML do espaço: {space_key}")
+        for html_filename in tqdm(html_files, desc=f"Convertendo"):
+            page_title_cleaned = os.path.splitext(html_filename)[0]
+            html_path = os.path.join(html_space_folder, html_filename)
+            md_path = os.path.join(md_space_folder, html_filename.replace('.html', '.md'))
 
-        for space_key in space_keys:
-            html_space_folder = os.path.join(html_folder, space_key)
-            md_space_folder = os.path.join(md_folder, space_key)
-        if not os.path.exists(md_space_folder):
-            os.makedirs(md_space_folder, exist_ok=True)
+            with open(html_path, 'r', encoding='utf-8') as f:
+                html_content = f.read()
 
-        if not os.path.exists(html_space_folder):
-            print(f"⚠️ Pasta {html_space_folder} não encontrada, pulando...")
+            soup = BeautifulSoup(html_content, 'html.parser')
+            
+            page_text = soup.get_text().strip()
+            
+            if not page_text:
+                skipped_empty_count += 1
+                continue
 
-        for filename in os.listdir(html_space_folder):
-            if filename.endswith('.html'):
-                html_path = os.path.join(html_space_folder, filename)
-                md_filename = filename.replace('.html', '.md')
-                md_path = os.path.join(md_space_folder, md_filename)
+            for img in soup.find_all('img'):
+                img_src = img.get('src')
+                if not img_src: continue
+                
+                img_name = os.path.basename(urlparse(img_src).path)
+                local_img_folder = os.path.join(ATTACHMENTS_FOLDER, space_key, page_title_cleaned)
+                local_img_path = os.path.join(local_img_folder, sanitize_filename(img_name))
+                
+                if os.path.exists(local_img_path):
+                    relative_path = os.path.relpath(local_img_path, start=md_space_folder)
+                    img['src'] = relative_path.replace("\\", "/")
+                else:
+                    img['alt'] = f"{img.get('alt', '')} (Imagem não encontrada localmente: {img_name})"
 
-                with open(html_path, 'r', encoding='utf-8') as f:
-                    html_content = f.read()
-                    
-                    markdown = convert_html_to_md(html_content)
-                with open(md_path, 'w', encoding='utf-8') as f:
-                    f.write(markdown)
-                    logging.info(f"Arquivo convertido com sucesso: {md_path}")
-    except Exception as e:
-        logging.error(f"Erro ao processar {html_path}: {e}")
+            h = html2text.HTML2Text()
+            h.body_width = 0
+            markdown_content = h.handle(str(soup))
+
+            with open(md_path, 'w', encoding='utf-8') as f:
+                f.write(markdown_content)
+
+    print(f"\n✅ Conversão para Markdown concluída.")
+    if skipped_empty_count > 0:
+        print(f"ℹ️  {skipped_empty_count} páginas vazias foram ignoradas.")
