@@ -1,4 +1,4 @@
-import requests  # Usaremos para fazer a chamada de rede
+import requests
 from rag.retriever import FaissRetriever
 
 class Chatbot:
@@ -14,7 +14,7 @@ class Chatbot:
         """
         try:
             response = requests.post(self.llm_server_url, json={"prompt": prompt})
-            response.raise_for_status()  # Lança um erro se a resposta for 4xx ou 5xx
+            response.raise_for_status()
             data = response.json()
             if "error" in data:
                 return f"Erro no servidor do LLM: {data['error']}"
