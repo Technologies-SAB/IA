@@ -48,3 +48,6 @@ unstructured
 
 # LayoutParser for document layout analysis
 layoutparser
+
+# Language Detection
+langdetect
