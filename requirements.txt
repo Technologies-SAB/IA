@@ -50,4 +50,8 @@ unstructured
 layoutparser
 
 # Language Detection
-langdetect
+
+
+#Image Processing
+pytesseract
+pillow
