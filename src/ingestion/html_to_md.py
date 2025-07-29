@@ -5,8 +5,11 @@ from urllib.parse import urlparse, unquote
 from tqdm import tqdm
 
 from config import settings
+from processing.clean_markdown import clean_markdown_file
 from utils.clean_filename import sanitize_filename
 from processing.clean_html import clean_html_boilerplate
+from processing.clean_markdown import clean_markdown_file
+
 
 HTML_FOLDER = settings.CONFLUENCE_SAVE_FOLDER
 ATTACHMENTS_FOLDER = settings.IMAGES_FOLDER
@@ -102,9 +105,10 @@ def process_and_convert_to_md():
 
         h = html2text.HTML2Text(bodywidth=0)
         markdown_content = h.handle(str(soup))
+        cleaned_markdown = clean_markdown_file(markdown_content)
 
         with open(md_path, 'w', encoding='utf-8') as f:
-            f.write(markdown_content)
+            f.write(cleaned_markdown)
 
     print(f"\n✅ Conversão para Markdown concluída.")
     if skipped_empty_count > 0:
