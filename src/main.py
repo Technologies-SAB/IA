@@ -7,20 +7,25 @@ def run_pipeline(step):
         from ingestion.download_html import download_confluence_content
         download_confluence_content()
 
+    elif step == 'images':
+        print("\n--- PASSO 2: Iniciando Processamento de OCR nas Imagens ---")
+        from ingestion.download_html import download_confluence_content
+        download_confluence_content()
+
     elif step == 'convert':
-        print("\n--- PASSO 2: PROCESSANDO CONTEÚDO PARA MARKDOWN ---")
+        print("\n--- PASSO 3: PROCESSANDO CONTEÚDO PARA MARKDOWN ---")
         from ingestion.html_to_md import process_and_convert_to_md
         process_and_convert_to_md()
 
     elif step == 'embed':
         from embedding.generate_embeddings import update_embedding
-        print("--- PASSO 3: GERANDO EMBEDDINGS ---")
+        print("--- PASSO 4: GERANDO EMBEDDINGS ---")
         update_embedding(settings.MD_FOLDER)
         print("✅ Embeddings gerados e salvos localmente.")
 
     elif step == 'models':
         from training.download_models import download_embeddings_model, download_llm_model
-        print("--- PASSO 4: BAIXANDO MODELOS ---")
+        print("--- PASSO 5: BAIXANDO MODELOS ---")
         download_embeddings_model()
         download_llm_model()
         print("✅ Modelos baixados e salvos com sucesso.")
