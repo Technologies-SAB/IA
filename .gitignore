@@ -11,3 +11,4 @@ models
 /.vs/ProjectSettings.json
 .venv
 *.log
+pipeline.md
