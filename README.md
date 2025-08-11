@@ -150,4 +150,4 @@ Durante o chat, digite 'sair' para encerrar a conversa.
 ---
 
 ## 📌 Licença
-Este projeto é de uso interno da empresa Hospitality Holding Investments de propriedade da SAB.
+Este projeto é de uso interno e de propriedade da SAB Technologies.
