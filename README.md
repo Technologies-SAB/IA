@@ -109,11 +109,13 @@ python src/main.py download
 2. Gere os embeddings locais:
 ```bash
 python src/main.py embed
+```
 
 
 3. Baixe os modelos necessários (embeddings e LLM):
 ```bash
 python src/main.py models
+```
 
 4. Inicie o chatbot (linha de comando):
 ```bash
@@ -123,7 +125,7 @@ python src/main.py chat
 5. Inicie o server LLM (em um novo terminal):
 ```bash
 python src/llm_server.py
-´´´
+```
 
 Durante o chat, digite 'sair' para encerrar a conversa.
 
