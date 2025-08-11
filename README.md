@@ -134,10 +134,15 @@ Durante o chat, digite 'sair' para encerrar a conversa.
 ## 🧠 Tecnologias Utilizadas
 
 • Python 3.10+
+
 • transformers, sentence-transformers
+
 • langchain, faiss
+
 • llama.cpp, GGUF
+
 • streamlit, gradio, fastapi
+
 • pytesseract, Pillow, BeautifulSoup
 
 ---
