@@ -149,7 +149,9 @@ Durante o chat, digite 'sair' para encerrar a conversa.
 
 ## 🛡️ Restrições Técnicas
 • Nenhuma dependência de nuvem (OpenAI, Google, Microsoft, etc.)
+
 • Execução local via CPU
+
 • Armazenamento e inferência 100% offline
 
 ---
